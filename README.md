@@ -5,6 +5,14 @@
 
 ## VII. Automatisation avec Ansible
 
+### 25. Installation d'Ansible
+
+```bash
+sudo apt update
+sudo apt install -y ansible
+ansible --version
+```
+
 ### 26. Fichier inventory
 
 ```ini

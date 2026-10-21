@@ -1,54 +1,40 @@
-# 🚀 Activité 3 — Ansible, API Node.js & Dockerisation
+# Activité 3 – Automatisation avec Ansible
 
-Ce projet regroupe l'automatisation avec Ansible, la création d'une API Node.js/Express pour le portfolio, et la conteneurisation complète (Frontend + API).
+> **Enseignant :** Wahid Hamdi
+> **Auteur :** Nawres Zarrouki
 
-**Auteur** : Nawres Zarrouki
+## VII. Automatisation avec Ansible
 
----
-
-## VII. Automatisation avec Ansibl
-L'automatisation est réalisée à l'aide d'Ansible pour configurer nos serveurs.
-
-### 26. Configuration de l'inventaire
-
-Un fichier `inventory` a été créé pour cibler le serveur local :
+### 26. Fichier inventory
 
 ```ini
 [webservers]
 localhost ansible_connection=local
+```
+
 Test de communication :
 
-bash
+```bash
 ansible all -i inventory -m ping
-27. Playbook d'installation de Git
-Le playbook install_git.yml permet d'installer le package Git :
+```
 
-yaml
----
-- name: Installer Git
-  hosts: webservers
-  become: yes
-  tasks:
-    - name: Mettre à jour le cache apt
-      apt:
-        update_cache: yes
+### 28. Playbook d'installation de Docker
 
-    - name: Installer le package git
-      apt:
-        name: git
-        state: present
-28. Playbook d'installation de Docker
-Le playbook install_docker.yml permet d'installer Docker et Docker Compose de manière propre :
+Fichier `install_docker.yml` :
 
-yaml
+```yaml
 ---
 - name: Installer Docker proprement
   hosts: webservers
   become: yes
   tasks:
-    - name: Supprimer les paquets Docker conflictuels
+    - name: Supprimer les paquets Docker conflictuels (dépôt officiel)
       apt:
-        name: [docker-ce, docker-ce-cli, containerd.io, docker-compose-plugin]
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-compose-plugin
         state: absent
         purge: yes
         autoremove: yes
@@ -57,9 +43,11 @@ yaml
       apt:
         update_cache: yes
 
-    - name: Installer Docker et Docker Compose
+    - name: Installer Docker et Docker Compose (dépôts Ubuntu)
       apt:
-        name: [docker.io, docker-compose-v2]
+        name:
+          - docker.io
+          - docker-compose-v2
         state: present
 
     - name: Démarrer et activer le service Docker
@@ -67,6 +55,21 @@ yaml
         name: docker
         state: started
         enabled: yes
-📸 Preuve : Exécution du playbook Docker et vérification de la version.
 
-https://./docs/01-ansible-docker-install.png
+    - name: Ajouter l'utilisateur au groupe docker
+      user:
+        name: nawres
+        groups: docker
+        append: yes
+```
+
+Exécution et vérification :
+
+```bash
+ansible-playbook -i inventory install_docker.yml
+docker --version
+```
+
+Résultat : `PLAY RECAP : ok=6 changed=4 unreachable=0 failed=0`, puis `Docker version 29.1.3`.
+
+![Installation de Docker avec Ansible et docker --version](docs/01-ansible-docker-install.png)

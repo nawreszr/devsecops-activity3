@@ -44,25 +44,25 @@ ansible all -i inventory -m ping
 
 ![Test ansible ping](docs/02-ansible-ping.png)
 
-### 27. Premier playbook : installer un package (curl)
+### 27. Premier playbook : installer un package (git)
 
-Fichier `install_curl.yml` :
+Fichier `install_git.yml` :
 
 ```yaml
 ---
-- name: Installer curl
+- name: Installer git
   hosts: all
   become: true
   tasks:
-    - name: Installer le package curl
+    - name: Installer le package git
       ansible.builtin.apt:
-        name: curl
+        name: git
         state: present
         update_cache: true
 ```
 
 ```bash
-ansible-playbook -i inventory install_curl.yml
+ansible-playbook -i inventory install_git.yml
 ```
 
 ![Exécution du playbook](docs/03-ansible-git.png)

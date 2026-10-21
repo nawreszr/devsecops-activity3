@@ -44,25 +44,25 @@ ansible all -i inventory -m ping
 
 ![Test ansible ping](docs/02-ansible-ping.png)
 
-### 27. Premier playbook : installer un package (git)
+### 27. Premier playbook : installer un package (curl)
 
-Fichier `install_git.yml` :
+Fichier `install_curl.yml` :
 
 ```yaml
 ---
-- name: Installer git
+- name: Installer curl
   hosts: all
   become: true
   tasks:
-    - name: Installer le package git
+    - name: Installer le package curl
       ansible.builtin.apt:
-        name: git
+        name: curl
         state: present
         update_cache: true
 ```
 
 ```bash
-ansible-playbook -i inventory install_git.yml
+ansible-playbook -i inventory install_curl.yml
 ```
 
 ![Exécution du playbook](docs/03-ansible-git.png)
@@ -123,7 +123,91 @@ Résultat : `PLAY RECAP : ok=6 changed=4 unreachable=0 failed=0` et `Docker vers
 
 ## VIII. API Node.js / Express
 
-_À compléter._
+### 29. Structure du projet et démarrage
+
+```
+api/
+├── package.json
+├── server.js
+├── data/
+│   ├── profile.json
+│   ├── projects.json
+│   └── skills.json
+└── .env.example
+```
+
+```bash
+cd api
+npm init -y
+npm install express cors dotenv
+node server.js
+```
+
+Fichier `api/server.js` :
+
+```js
+require("dotenv").config();
+const express = require("express");
+const cors = require("cors");
+
+const profile = require("./data/profile.json");
+const projects = require("./data/projects.json");
+const skills = require("./data/skills.json");
+
+const app = express();
+app.use(cors());
+
+app.get("/api/health", (req, res) => {
+  res.json({ status: "ok", message: "API opérationnelle" });
+});
+
+app.get("/api/profile", (req, res) => res.json(profile));
+app.get("/api/projects", (req, res) => res.json(projects));
+app.get("/api/skills", (req, res) => res.json(skills));
+
+const PORT = process.env.PORT || 4000;
+app.listen(PORT, () => console.log(`API démarrée sur le port ${PORT}`));
+```
+
+### 30. Route `GET /api/health`
+
+Retourne l'état de l'API.
+
+```bash
+curl http://localhost:4000/api/health
+```
+
+### 31. Route `GET /api/profile`
+
+Retourne les informations principales du Portfolio au format JSON.
+
+```bash
+curl http://localhost:4000/api/profile
+```
+
+### 32. Route `GET /api/projects`
+
+Retourne la liste des projets du Portfolio.
+
+```bash
+curl http://localhost:4000/api/projects
+```
+
+### 33. Route `GET /api/skills`
+
+Retourne la liste des compétences.
+
+```bash
+curl http://localhost:4000/api/skills
+```
+
+### Résultat des tests (questions 30 à 33)
+
+La capture suivante regroupe les quatre appels `curl` : `/api/health`, `/api/profile`, `/api/projects` et `/api/skills`.
+
+![Tests curl des 4 routes de l'API](docs/04-api-test.png)
+
+---
 
 ## IX. Variables d'environnement
 

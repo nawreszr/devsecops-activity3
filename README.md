@@ -8,7 +8,7 @@
 
 - [VII. Automatisation avec Ansible](#vii-automatisation-avec-ansible)
 - [VIII. API Node.js / Express](#viii-api-nodejs--express)
-- [IX. Variables d'environnement](#ix-variables-denvironnement)
+- [IX. Variables d'environnement et configuration](#ix-variables-denvironnement-et-configuration)
 - [X. Dockerisation frontend + API](#x-dockerisation-frontend--api)
 
 Les captures d'écran sont dans le dossier [`docs/`](docs/).
@@ -129,11 +129,12 @@ Résultat : `PLAY RECAP : ok=6 changed=4 unreachable=0 failed=0` et `Docker vers
 api/
 ├── package.json
 ├── server.js
-├── data/
-│   ├── profile.json
-│   ├── projects.json
-│   └── skills.json
-└── .env.example
+└── data/
+    ├── profile.json
+    ├── projects.json
+    └── skills.json
+.env.example
+.gitignore
 ```
 
 ```bash
@@ -165,7 +166,7 @@ app.get("/api/profile", (req, res) => res.json(profile));
 app.get("/api/projects", (req, res) => res.json(projects));
 app.get("/api/skills", (req, res) => res.json(skills));
 
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`API démarrée sur le port ${PORT}`));
 ```
 
@@ -174,7 +175,7 @@ app.listen(PORT, () => console.log(`API démarrée sur le port ${PORT}`));
 Retourne l'état de l'API.
 
 ```bash
-curl http://localhost:4000/api/health
+curl http://localhost:5000/api/health
 ```
 
 ### 31. Route `GET /api/profile`
@@ -182,7 +183,7 @@ curl http://localhost:4000/api/health
 Retourne les informations principales du Portfolio au format JSON.
 
 ```bash
-curl http://localhost:4000/api/profile
+curl http://localhost:5000/api/profile
 ```
 
 ### 32. Route `GET /api/projects`
@@ -190,7 +191,7 @@ curl http://localhost:4000/api/profile
 Retourne la liste des projets du Portfolio.
 
 ```bash
-curl http://localhost:4000/api/projects
+curl http://localhost:5000/api/projects
 ```
 
 ### 33. Route `GET /api/skills`
@@ -198,7 +199,7 @@ curl http://localhost:4000/api/projects
 Retourne la liste des compétences.
 
 ```bash
-curl http://localhost:4000/api/skills
+curl http://localhost:5000/api/skills
 ```
 
 ### Résultat des tests (questions 30 à 33)
@@ -233,9 +234,68 @@ Le frontend consomme l'API : les projets et les compétences affichés viennent 
 
 ---
 
-## IX. Variables d'environnement
+## IX. Variables d'environnement et configuration
 
-_À compléter._
+### 36. Variable `API_URL`
+
+L'URL de l'API est configurée via la variable d'environnement `API_URL`.
+
+**Pourquoi ne pas la coder en dur ?**
+
+- L'URL change selon l'environnement : `localhost` en développement, `api` dans Docker Compose, un domaine en production.
+- Changer d'environnement ne demande alors aucune modification du code ni de reconstruction.
+- La configuration reste séparée du code, ce qui est une bonne pratique de sécurité et de déploiement.
+
+### 37. Fichier `.env.example`
+
+Fichier d'exemple, **sans aucun secret réel**. Le vrai `.env` est ignoré par Git.
+
+Commandes utilisées pour le créer :
+
+```bash
+# 1. Créer le fichier .env.example (qui ira sur GitHub)
+cat > .env.example << 'EOT'
+# Fichier d'exemple de variables d'environnement
+# Ne jamais mettre de vrais secrets ici !
+
+# Port d'écoute de l'API Express
+PORT=5000
+
+# URL de l'API (utilisée par le Frontend Next.js)
+API_URL=http://localhost:5000
+EOT
+
+# 2. Créer le vrai fichier .env local (qui reste sur la VM)
+cp .env.example .env
+
+# 3. Ajouter .env au .gitignore pour éviter de le pousser sur GitHub par erreur
+echo ".env" >> .gitignore
+echo "node_modules/" >> .gitignore
+echo "api/node_modules/" >> .gitignore
+```
+
+Contenu de `.env.example` :
+
+```env
+# Fichier d'exemple de variables d'environnement
+# Ne jamais mettre de vrais secrets ici !
+
+# Port d'écoute de l'API Express
+PORT=5000
+
+# URL de l'API (utilisée par le Frontend Next.js)
+API_URL=http://localhost:5000
+```
+
+Contenu ajouté à `.gitignore` :
+
+```gitignore
+.env
+node_modules/
+api/node_modules/
+```
+
+---
 
 ## X. Dockerisation frontend + API
 

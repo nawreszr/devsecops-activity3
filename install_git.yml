@@ -1,0 +1,13 @@
+---
+- name: Installer Git
+  hosts: webservers
+  become: yes
+  tasks:
+    - name: Mettre à jour le cache apt
+      apt:
+        update_cache: yes
+
+    - name: Installer le package git
+      apt:
+        name: git
+        state: present

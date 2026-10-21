@@ -1,0 +1,38 @@
+---
+- name: Installer Docker proprement
+  hosts: webservers
+  become: yes
+  tasks:
+    - name: Supprimer les paquets Docker conflictuels (dépôt officiel)
+      apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-compose-plugin
+        state: absent
+        purge: yes
+        autoremove: yes
+
+    - name: Mettre à jour le cache apt
+      apt:
+        update_cache: yes
+
+    - name: Installer Docker et Docker Compose (dépôts Ubuntu)
+      apt:
+        name:
+          - docker.io
+          - docker-compose-v2
+        state: present
+
+    - name: Démarrer et activer le service Docker
+      systemd:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Ajouter l'utilisateur au groupe docker
+      user:
+        name: nawres
+        groups: docker
+        append: yes

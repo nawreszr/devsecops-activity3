@@ -301,7 +301,7 @@ api/node_modules/
 
 ### 38. Dockerfile du frontend Next.js
 
-Fichier `./Dockerfile.frontend` :
+Fichier `Dockerfile.frontend` :
 
 ```dockerfile
 # --- Étape 1 : Build ---
@@ -331,7 +331,7 @@ Ce Dockerfile installe les dépendances, construit l'application Next.js puis la
 
 ### 39. Dockerfile de l'API Node.js / Express
 
-Fichier `./Dockerfile.api` :
+Fichier `Dockerfile.api` :
 
 ```dockerfile
 FROM node:20-alpine
@@ -348,12 +348,13 @@ Ce Dockerfile installe les dépendances de l'API, copie le code et lance le serv
 ### 40. Construction des images Docker
 
 ```bash
-docker build -t devsecops-portfolio .
-docker build -t devsecops-api .
+docker build -t devsecops-portfolio -f Dockerfile.frontend .
+docker build -t devsecops-api -f Dockerfile.api .
 docker images | grep devsecops
 ```
 
-[defaults]2](docs/05-docker-images.png)
+![Images Docker construites](docs/05-docker-images.png)
+
 ### 41. Docker Compose
 
 Fichier `docker-compose.yml` :
@@ -384,15 +385,18 @@ docker compose up -d --build
 docker compose ps
 ```
 
-[defaults]2](docs/06-docker-compose.png)
+![Résultat de docker compose ps](docs/06-docker-compose.png)
+
 ### 42. Communication frontend ↔ API dans le réseau Docker Compose
 
-Docker Compose crée un réseau commun où chaque service est joignable par son nom. Le frontend appelle donc l'API par le nom du service (par exemple `http://api:5000`) et non par `localhost`.
+Docker Compose place les deux services dans un même réseau, où ils se joignent par leur nom (par exemple http://api:5000 de conteneur à conteneur). Ici, le navigateur appelle directement l API. Le frontend reçoit donc au build la variable NEXT_PUBLIC_API_URL=http://192.168.78.129:5002, c est-à-dire l adresse de la VM et le port publié 5002 qui redirige vers le port 5000 de l API.
 
-[defaults]2](docs/07-portfolio-docker.png)
+
+![Portfolio dans Docker](docs/07-portfolio-docker.png)
+
 ### Captures supplémentaires
 
-**app finale**
+**Application finale**
 
-[defaults]t](docs/08-app-finale.png)
+![Application finale : le Portfolio affiche les données de l API](docs/08-app-finale.png)
 

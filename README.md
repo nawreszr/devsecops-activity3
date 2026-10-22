@@ -213,7 +213,7 @@ La capture suivante regroupe les quatre appels `curl` : `/api/health`, `/api/pro
 Le frontend ne lit plus uniquement des données locales : il appelle l'API Express avec `fetch` et affiche la réponse JSON.
 
 ```js
-const res = await fetch(`${process.env.API_URL}/api/projects`, { cache: "no-store" });
+const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/projects`, { cache: "no-store" });
 const projects = await res.json();
 ```
 
@@ -222,7 +222,7 @@ const projects = await res.json();
 Même principe pour les compétences, avec `/api/skills`.
 
 ```js
-const res = await fetch(`${process.env.API_URL}/api/skills`, { cache: "no-store" });
+const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/skills`, { cache: "no-store" });
 const skills = await res.json();
 ```
 

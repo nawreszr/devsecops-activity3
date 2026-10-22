@@ -392,9 +392,7 @@ docker compose ps
 Docker Compose place les deux services dans un même réseau, où ils se joignent par leur nom (par exemple http://api:5000 de conteneur à conteneur). Ici, le navigateur appelle directement l API. Le frontend reçoit donc au build la variable NEXT_PUBLIC_API_URL=http://192.168.78.129:5002, c est-à-dire l adresse de la VM et le port publié 5002 qui redirige vers le port 5000 de l API.
 
 
-![Portfolio dans Docker](docs/07-portfolio-docker.png)
 
-### Captures supplémentaires
 
 **Application finale**
 

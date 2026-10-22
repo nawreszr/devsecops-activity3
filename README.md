@@ -299,4 +299,100 @@ api/node_modules/
 
 ## X. Dockerisation frontend + API
 
-_À compléter._
+### 38. Dockerfile du frontend Next.js
+
+Fichier `./Dockerfile.frontend` :
+
+```dockerfile
+# --- Étape 1 : Build ---
+FROM node:20-alpine AS builder
+WORKDIR /app
+COPY frontend/package*.json ./
+RUN npm config set registry https://registry.npmmirror.com && npm install
+COPY frontend/ .
+ARG NEXT_PUBLIC_API_URL=http://api:5000
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+RUN npm run build
+
+# --- Étape 2 : Runner ---
+FROM node:20-alpine AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
+EXPOSE 3000
+CMD ["node", "server.js"]
+```
+
+Ce Dockerfile installe les dépendances, construit l'application Next.js puis la démarre dans un conteneur.
+
+### 39. Dockerfile de l'API Node.js / Express
+
+Fichier `./Dockerfile.api` :
+
+```dockerfile
+FROM node:20-alpine
+WORKDIR /app
+COPY api/package*.json ./
+RUN npm config set registry https://registry.npmmirror.com && npm install
+COPY api/ .
+EXPOSE 5000
+CMD ["node", "server.js"]
+```
+
+Ce Dockerfile installe les dépendances de l'API, copie le code et lance le serveur Express.
+
+### 40. Construction des images Docker
+
+```bash
+docker build -t devsecops-portfolio .
+docker build -t devsecops-api .
+docker images | grep devsecops
+```
+
+[defaults]2](docs/05-docker-images.png)
+### 41. Docker Compose
+
+Fichier `docker-compose.yml` :
+
+```yaml
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    ports:
+      - "5002:5000"
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+      args:
+        NEXT_PUBLIC_API_URL: http://192.168.78.129:5002
+    ports:
+      - "3002:3000"
+    depends_on:
+      - api
+```
+
+```bash
+docker compose up -d --build
+docker compose ps
+```
+
+[defaults]2](docs/06-docker-compose.png)
+### 42. Communication frontend ↔ API dans le réseau Docker Compose
+
+Docker Compose crée un réseau commun où chaque service est joignable par son nom. Le frontend appelle donc l'API par le nom du service (par exemple `http://api:5000`) et non par `localhost`.
+
+[defaults]2](docs/07-portfolio-docker.png)
+### Captures supplémentaires
+
+**app finale**
+
+[defaults]t](docs/08-app-finale.png)
+
